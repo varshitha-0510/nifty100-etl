@@ -1,26 +1,33 @@
 from pathlib import Path
 import pandas as pd
 
-
 RAW_DATA_PATH = Path("data/raw")
+
+CORE_FILES = {
+    "analysis.xlsx",
+    "balancesheet.xlsx",
+    "cashflow.xlsx",
+    "companies.xlsx",
+    "documents.xlsx",
+    "profitandloss.xlsx",
+    "prosandcons.xlsx"
+}
 
 
 def load_excel_file(file_path):
     """
-    Load an Excel file and return DataFrame.
+    Load Excel file with correct header handling.
     """
 
-    df = pd.read_excel(file_path)
+    if file_path.name in CORE_FILES:
+        return pd.read_excel(file_path, header=1)
 
-    return df
+    return pd.read_excel(file_path, header=0)
 
 
 def process_all_files():
-    """
-    Read all Excel files from data/raw.
-    """
 
-    excel_files = list(RAW_DATA_PATH.glob("*.xlsx"))
+    excel_files = sorted(RAW_DATA_PATH.glob("*.xlsx"))
 
     print(f"\nFound {len(excel_files)} Excel files\n")
 
@@ -30,20 +37,18 @@ def process_all_files():
 
             df = load_excel_file(file)
 
-            print("=" * 50)
+            print("=" * 60)
             print(f"File Name : {file.name}")
-            print(f"Rows      : {df.shape[0]}")
-            print(f"Columns   : {df.shape[1]}")
+            print(f"Rows      : {len(df)}")
+            print(f"Columns   : {len(df.columns)}")
 
-            print("Column Names:")
-            print(df.columns.tolist())
+            print("First 5 Columns:")
+            print(df.columns.tolist()[:5])
 
             print()
 
         except Exception as e:
-
-            print(f"Error reading {file.name}")
-            print(e)
+            print(f"Error reading {file.name}: {e}")
 
 
 if __name__ == "__main__":
